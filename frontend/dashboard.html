@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TravelTech — Личный кабинет</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      margin: 0;
+    }
+    .logout-button {
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .dashboard-container {
+      padding: 20px;
+      display: flex;
+      gap: 20px;
+    }
+    .sidebar {
+      width: 250px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      height: fit-content;
+    }
+    .sidebar h2 {
+      margin-top: 0;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar li {
+      margin-bottom: 10px;
+    }
+    .sidebar a {
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+    }
+    .sidebar a:hover {
+      color: #0056b3;
+    }
+    .content {
+      flex: 1;
+    }
+    .user-info {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .trips-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .trip-card {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+    .trip-card h3 {
+      margin-top: 0;
+    }
+    .trip-card button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-right: 10px;
+    }
+    .trip-card .cancel-button {
+      background-color: #dc3545;
+    }
+    .add-button {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>TravelTech</h1>
+    <button class="logout-button" id="logoutButton">Выйти</button>
+  </div>
+  <div class="dashboard-container">
+    <div class="sidebar">
+      <h2>Меню</h2>
+      <ul>
+        <li><a href="#" id="addTripLink">Добавить поездку</a></li>
+        <li><a href="#" id="addFlightLink">Добавить рейс</a></li>
+        <li><a href="#" id="addHotelLink">Добавить отель</a></li>
+        <li><a href="#" id="addActivityLink">Добавить активность</a></li>
+      </ul>
+    </div>
+    <div class="content">
+      <div class="user-info">
+        <h2>Личная информация</h2>
+        <p>Имя: <span id="userName">Не указано</span></p>
+        <p>Фамилия: <span id="userSurname">Не указано</span></p>
+        <p>Отчество: <span id="userPatronymic">Не указано</span></p>
+        <p>Email: <span id="userEmail">Не указано</span></p>
+        <p>Дата рождения: <span id="userBirthDate">Не указана</span></p>
+        <p>Часовой пояс: <span id="userTimezone">Не указано</span></p>
+      </div>
+      <div>
+        <h2>Ваши поездки</h2>
+        <button class="add-button" id="addTripButton">Добавить поездку</button>
+        <div class="trips-container" id="tripsContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модальное окно для добавления поездки -->
+  <div id="addTripModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
+    <div style="background: #fff; padding: 20px; border-radius: 8px; width: 400px;">
+      <h3>Добавить поездку</h3>
+      <form id="addTripForm">
+        <input type="text" id="tripName" placeholder="Название поездки" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="tripStartDate" placeholder="Дата начала" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="tripEndDate" placeholder="Дата окончания" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between;">
+          <button type="button" id="cancelAddTrip" style="background-color: #dc3545; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Отмена</button>
+          <button type="submit" style="background-color: #28a745; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Добавить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно для добавления рейса -->
+  <div id="addFlightModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
+    <div style="background: #fff; padding: 20px; border-radius: 8px; width: 400px;">
+      <h3>Добавить рейс</h3>
+      <form id="addFlightForm">
+        <input type="text" id="flightNumber" placeholder="Номер рейса" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="flightDeparture" placeholder="Дата и время вылета" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="flightArrival" placeholder="Дата и время прилёта" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="text" id="departureAirport" placeholder="Аэропорт вылета" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="text" id="arrivalAirport" placeholder="Аэропорт прилёта" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between;">
+          <button type="button" id="cancelAddFlight" style="background-color: #dc3545; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Отмена</button>
+          <button type="submit" style="background-color: #28a745; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Добавить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальные окна для добавления отеля и активности можно добавить аналогично -->
+
+  <script>
+    // Проверка авторизации
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    // Загрузка информации о пользователе
+    async function loadUserInfo() {
+      try {
+        const response = await fetch('http://localhost:3000/api/auth/me', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const user = await response.json();
+        document.getElementById('userName').textContent = user.name || 'Не указано';
+        document.getElementById('userSurname').textContent = user.surname || 'Не указано';
+        document.getElementById('userPatronymic').textContent = user.patronymic || 'Не указано';
+        document.getElementById('userEmail').textContent = user.email || 'Не указано';
+        document.getElementById('userBirthDate').textContent = user.birth_date ? new Date(user.birth_date).toLocaleDateString() : 'Не указана';
+        document.getElementById('userTimezone').textContent = user.timezone || 'Не указано';
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Загрузка поездок пользователя
+    async function loadTrips() {
+      try {
+        const response = await fetch('http://localhost:3000/api/trips', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const trips = await response.json();
+        const tripsContainer = document.getElementById('tripsContainer');
+        tripsContainer.innerHTML = '';
+        if (Array.isArray(trips)) {
+          trips.forEach(trip => {
+            const tripCard = document.createElement('div');
+            tripCard.className = 'trip-card';
+            tripCard.innerHTML = `
+              <h3>${trip.name}</h3>
+              <p>${new Date(trip.start_date).toLocaleDateString()} — ${new Date(trip.end_date).toLocaleDateString()}</p>
+              <p>Статус: ${trip.status}</p>
+              <div>
+                <button onclick="viewTrip(${trip.trip_id})">Подробнее</button>
+                <button class="cancel-button" onclick="cancelTrip(${trip.trip_id})">Отменить</button>
+              </div>
+            `;
+            tripsContainer.appendChild(tripCard);
+          });
+        } else {
+          tripsContainer.innerHTML = '<p>Нет доступных поездок.</p>';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Выход из аккаунта
+    document.getElementById('logoutButton').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    });
+
+    // Обработчики для открытия модальных окон
+    document.getElementById('addTripLink').addEventListener('click', () => {
+      document.getElementById('addTripModal').style.display = 'flex';
+    });
+
+    document.getElementById('addFlightLink').addEventListener('click', () => {
+      document.getElementById('addFlightModal').style.display = 'flex';
+    });
+
+    document.getElementById('addTripButton').addEventListener('click', () => {
+      document.getElementById('addTripModal').style.display = 'flex';
+    });
+
+    // Закрытие модальных окон
+    document.getElementById('cancelAddTrip').addEventListener('click', () => {
+      document.getElementById('addTripModal').style.display = 'none';
+    });
+
+    document.getElementById('cancelAddFlight').addEventListener('click', () => {
+      document.getElementById('addFlightModal').style.display = 'none';
+    });
+
+    // Добавление поездки
+    document.getElementById('addTripForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const tripName = document.getElementById('tripName').value;
+    const tripStartDate = document.getElementById('tripStartDate').value;
+    const tripEndDate = document.getElementById('tripEndDate').value;
+
+    try {
+        const response = await fetch('http://localhost:3000/api/trips', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            name: tripName,
+            startDate: tripStartDate,
+            endDate: tripEndDate
+        }),
+        });
+        if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        alert('Поездка добавлена!');
+        document.getElementById('addTripModal').style.display = 'none';
+        loadTrips();
+    } catch (error) {
+        console.error('Error:', error);
+    }
+    });
+
+
+    // Добавление рейса
+    document.getElementById('addFlightForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const flightNumber = document.getElementById('flightNumber').value;
+      const flightDeparture = document.getElementById('flightDeparture').value;
+      const flightArrival = document.getElementById('flightArrival').value;
+      const departureAirport = document.getElementById('departureAirport').value;
+      const arrivalAirport = document.getElementById('arrivalAirport').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/api/flights', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            tripId: 1, // Здесь нужно передавать ID текущей поездки
+            flightNumber: flightNumber,
+            departure: flightDeparture,
+            arrival: flightArrival,
+            departureAirport: departureAirport,
+            arrivalAirport: arrivalAirport
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        alert('Рейс добавлен!');
+        document.getElementById('addFlightModal').style.display = 'none';
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    // Загрузка данных при открытии страницы
+    loadUserInfo();
+    loadTrips();
+
+    // Переход на страницу поездки
+    function viewTrip(tripId) {
+      window.location.href = `/trip.html?tripId=${tripId}`;
+    }
+
+    // Отмена поездки
+    async function cancelTrip(tripId) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ status: 'cancelled' }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        alert('Поездка отменена!');
+        loadTrips();
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  </script>
+</body>
+</html>
