@@ -5,17 +5,19 @@ import authenticateToken from '../middleware/auth.js';
 const router = express.Router();
 
 // Получение всех рейсов для поездки
-router.get('/:tripId', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
+  const { tripId } = req.query;
   try {
     const [flights] = await pool.query(
       'SELECT * FROM flights WHERE trip_id = ?',
-      [req.params.tripId]
+      [tripId]
     );
     res.json(flights);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // Добавление нового рейса
 router.post('/', authenticateToken, async (req, res) => {

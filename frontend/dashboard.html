@@ -35,34 +35,20 @@
       display: flex;
       gap: 20px;
     }
-    .sidebar {
-      width: 250px;
+    .content {
+      flex: 1;
+      display: flex;
+      gap: 20px;
+    }
+    .trips-list {
+      flex: 1;
+    }
+    .trip-final {
+      width: 300px;
       background: #fff;
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      height: fit-content;
-    }
-    .sidebar h2 {
-      margin-top: 0;
-    }
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-    .sidebar li {
-      margin-bottom: 10px;
-    }
-    .sidebar a {
-      text-decoration: none;
-      color: #007bff;
-      font-weight: bold;
-    }
-    .sidebar a:hover {
-      color: #0056b3;
-    }
-    .content {
-      flex: 1;
     }
     .user-info {
       background: #fff;
@@ -81,7 +67,8 @@
       padding: 20px;
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      width: 300px;
+      width: 100%;
+      margin-bottom: 20px;
     }
     .trip-card h3 {
       margin-top: 0;
@@ -108,6 +95,115 @@
       cursor: pointer;
       margin-bottom: 20px;
     }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .members-container {
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+    .member-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .member-status {
+      font-size: 0.8em;
+      padding: 2px 8px;
+      border-radius: 10px;
+      color: white;
+    }
+    .status-pending {
+      background-color: #ffc107;
+    }
+    .status-accepted {
+      background-color: #28a745;
+    }
+    .status-declined {
+      background-color: #dc3545;
+    }
+    .accept-button {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .decline-button {
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .trip-details {
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+    .trip-element {
+      background: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    .vote-buttons {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .vote-button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .vote-for {
+      background-color: #28a745;
+      color: #fff;
+    }
+    .vote-against {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    .votes-info {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .final-trip-section {
+      margin-top: 10px;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
+    }
+    .final-trip-section h4 {
+      margin-top: 0;
+    }
   </style>
 </head>
 <body>
@@ -116,41 +212,39 @@
     <button class="logout-button" id="logoutButton">Выйти</button>
   </div>
   <div class="dashboard-container">
-    <div class="sidebar">
-      <h2>Меню</h2>
-      <ul>
-        <li><a href="#" id="addTripLink">Добавить поездку</a></li>
-        <li><a href="#" id="addFlightLink">Добавить рейс</a></li>
-        <li><a href="#" id="addHotelLink">Добавить отель</a></li>
-        <li><a href="#" id="addActivityLink">Добавить активность</a></li>
-      </ul>
-    </div>
     <div class="content">
-      <div class="user-info">
-        <h2>Личная информация</h2>
-        <p>Имя: <span id="userName">Не указано</span></p>
-        <p>Фамилия: <span id="userSurname">Не указано</span></p>
-        <p>Отчество: <span id="userPatronymic">Не указано</span></p>
-        <p>Email: <span id="userEmail">Не указано</span></p>
-        <p>Дата рождения: <span id="userBirthDate">Не указана</span></p>
-        <p>Часовой пояс: <span id="userTimezone">Не указано</span></p>
+      <div class="trips-list">
+        <div class="user-info">
+          <h2>Личная информация</h2>
+          <p>Имя: <span id="userName">Не указано</span></p>
+          <p>Фамилия: <span id="userSurname">Не указано</span></p>
+          <p>Отчество: <span id="userPatronymic">Не указано</span></p>
+          <p>Email: <span id="userEmail">Не указано</span></p>
+          <p>Дата рождения: <span id="userBirthDate">Не указана</span></p>
+          <p>Часовой пояс: <span id="userTimezone">Не указано</span></p>
+        </div>
+        <div>
+          <h2>Ваши поездки</h2>
+          <button class="add-button" id="addTripButton">Добавить поездку</button>
+          <div class="trips-container" id="tripsContainer"></div>
+        </div>
       </div>
-      <div>
-        <h2>Ваши поездки</h2>
-        <button class="add-button" id="addTripButton">Добавить поездку</button>
-        <div class="trips-container" id="tripsContainer"></div>
+      <div class="trip-final" id="tripFinal">
+        <h3>Итоговая поездка</h3>
+        <p id="finalTripName">Выберите поездку</p>
+        <div class="final-trip-section" id="finalTripDetails"></div>
       </div>
     </div>
   </div>
 
   <!-- Модальное окно для добавления поездки -->
-  <div id="addTripModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
-    <div style="background: #fff; padding: 20px; border-radius: 8px; width: 400px;">
+  <div id="addTripModal" class="modal">
+    <div class="modal-content">
       <h3>Добавить поездку</h3>
       <form id="addTripForm">
-        <input type="text" id="tripName" placeholder="Название поездки" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="datetime-local" id="tripStartDate" placeholder="Дата начала" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="datetime-local" id="tripEndDate" placeholder="Дата окончания" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="text" id="tripName" placeholder="Название поездки" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="tripStartDate" placeholder="Дата начала" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="tripEndDate" placeholder="Дата окончания" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
         <div style="display: flex; justify-content: space-between;">
           <button type="button" id="cancelAddTrip" style="background-color: #dc3545; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Отмена</button>
           <button type="submit" style="background-color: #28a745; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Добавить</button>
@@ -159,16 +253,32 @@
     </div>
   </div>
 
+  <!-- Модальное окно для приглашения участников -->
+  <div id="inviteMemberModal" class="modal">
+    <div class="modal-content">
+      <h3>Пригласить участника</h3>
+      <form id="inviteMemberForm">
+        <input type="hidden" id="inviteTripId">
+        <input type="email" id="memberEmail" placeholder="Email участника" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between;">
+          <button type="button" id="cancelInviteMember" style="background-color: #dc3545; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Отмена</button>
+          <button type="submit" style="background-color: #28a745; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Пригласить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Модальное окно для добавления рейса -->
-  <div id="addFlightModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center;">
-    <div style="background: #fff; padding: 20px; border-radius: 8px; width: 400px;">
+  <div id="addFlightModal" class="modal">
+    <div class="modal-content">
       <h3>Добавить рейс</h3>
       <form id="addFlightForm">
-        <input type="text" id="flightNumber" placeholder="Номер рейса" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="datetime-local" id="flightDeparture" placeholder="Дата и время вылета" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="datetime-local" id="flightArrival" placeholder="Дата и время прилёта" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="text" id="departureAirport" placeholder="Аэропорт вылета" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
-        <input type="text" id="arrivalAirport" placeholder="Аэропорт прилёта" required style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="hidden" id="flightTripId">
+        <input type="text" id="flightNumber" placeholder="Номер рейса" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="flightDeparture" placeholder="Дата и время вылета" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="flightArrival" placeholder="Дата и время прилёта" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="text" id="departureAirport" placeholder="Аэропорт вылета" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="text" id="arrivalAirport" placeholder="Аэропорт прилёта" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
         <div style="display: flex; justify-content: space-between;">
           <button type="button" id="cancelAddFlight" style="background-color: #dc3545; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Отмена</button>
           <button type="submit" style="background-color: #28a745; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Добавить</button>
@@ -177,7 +287,40 @@
     </div>
   </div>
 
-  <!-- Модальные окна для добавления отеля и активности можно добавить аналогично -->
+  <!-- Модальное окно для добавления отеля -->
+  <div id="addHotelModal" class="modal">
+    <div class="modal-content">
+      <h3>Добавить отель</h3>
+      <form id="addHotelForm">
+        <input type="hidden" id="hotelTripId">
+        <input type="text" id="hotelName" placeholder="Название отеля" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="hotelCheckIn" placeholder="Дата заезда" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="hotelCheckOut" placeholder="Дата выезда" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="text" id="hotelAddress" placeholder="Адрес отеля" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between;">
+          <button type="button" id="cancelAddHotel" style="background-color: #dc3545; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Отмена</button>
+          <button type="submit" style="background-color: #28a745; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Добавить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Модальное окно для добавления активности -->
+  <div id="addActivityModal" class="modal">
+    <div class="modal-content">
+      <h3>Добавить активность</h3>
+      <form id="addActivityForm">
+        <input type="hidden" id="activityTripId">
+        <input type="text" id="activityName" placeholder="Название активности" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="datetime-local" id="activityDate" placeholder="Дата и время" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <input type="text" id="activityLocation" placeholder="Место проведения" required style="width: 93%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 4px;">
+        <div style="display: flex; justify-content: space-between;">
+          <button type="button" id="cancelAddActivity" style="background-color: #dc3545; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Отмена</button>
+          <button type="submit" style="background-color: #28a745; color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Добавить</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
     // Проверка авторизации
@@ -185,9 +328,11 @@
     if (!token) {
       window.location.href = '/login.html';
     }
+    let currentTripId = null;
+
 
     // Загрузка информации о пользователе
-    async function loadUserInfo() {
+async function loadUserInfo() {
       try {
         const response = await fetch('http://localhost:3000/api/auth/me', {
           headers: { 'Authorization': `Bearer ${token}` },
@@ -229,10 +374,17 @@
               <p>Статус: ${trip.status}</p>
               <div>
                 <button onclick="viewTrip(${trip.trip_id})">Подробнее</button>
-                <button class="cancel-button" onclick="cancelTrip(${trip.trip_id})">Отменить</button>
+                <button onclick="openAddFlightModal(${trip.trip_id})">Добавить рейс</button>
+                <button onclick="openAddHotelModal(${trip.trip_id})">Добавить отель</button>
+                <button onclick="openAddActivityModal(${trip.trip_id})">Добавить активность</button>
+                <button onclick="openInviteMemberModal(${trip.trip_id})">Пригласить участника</button>
               </div>
+              <div class="members-container" id="membersContainer_${trip.trip_id}"></div>
+              <div class="trip-details" id="tripDetails_${trip.trip_id}"></div>
             `;
             tripsContainer.appendChild(tripCard);
+            loadTripMembers(trip.trip_id);
+            loadTripDetails(trip.trip_id);
           });
         } else {
           tripsContainer.innerHTML = '<p>Нет доступных поездок.</p>';
@@ -242,21 +394,477 @@
       }
     }
 
+    // Просмотр поездки
+    function viewTrip(tripId) {
+      currentTripId = tripId;
+      loadFinalTrip(tripId);
+    }
+
+    // Загрузка итоговой версии поездки
+    async function loadFinalTrip(tripId) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const trip = await response.json();
+        document.getElementById('finalTripName').textContent = trip.name;
+
+        const finalTripDetails = document.getElementById('finalTripDetails');
+        finalTripDetails.innerHTML = '';
+
+        // Загрузка рейсов с наибольшим количеством голосов "за"
+        const flightsResponse = await fetch(`http://localhost:3000/api/flights?tripId=${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const flights = await flightsResponse.json();
+        if (flights.length > 0) {
+          const topFlight = await getTopVotedObject(tripId, 'flight', flights);
+          if (topFlight) {
+            const flightElement = document.createElement('div');
+            flightElement.className = 'trip-element';
+            flightElement.innerHTML = `
+              <p><strong>Рейс:</strong> ${topFlight.flight_number}</p>
+              <p>${new Date(topFlight.departure).toLocaleString()} — ${new Date(topFlight.arrival).toLocaleString()}</p>
+              <p>${topFlight.departure_airport} → ${topFlight.arrival_airport}</p>
+            `;
+            finalTripDetails.appendChild(flightElement);
+          }
+        }
+
+        // Загрузка отелей с наибольшим количеством голосов "за"
+        const hotelsResponse = await fetch(`http://localhost:3000/api/hotels?tripId=${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const hotels = await hotelsResponse.json();
+        if (hotels.length > 0) {
+          const topHotel = await getTopVotedObject(tripId, 'hotel', hotels);
+          if (topHotel) {
+            const hotelElement = document.createElement('div');
+            hotelElement.className = 'trip-element';
+            hotelElement.innerHTML = `
+              <p><strong>Отель:</strong> ${topHotel.name}</p>
+              <p>${new Date(topHotel.check_in).toLocaleString()} — ${new Date(topHotel.check_out).toLocaleString()}</p>
+              <p>${topHotel.address}</p>
+            `;
+            finalTripDetails.appendChild(hotelElement);
+          }
+        }
+
+        // Загрузка активностей с наибольшим количеством голосов "за"
+        const activitiesResponse = await fetch(`http://localhost:3000/api/activities?tripId=${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const activities = await activitiesResponse.json();
+        if (activities.length > 0) {
+          const topActivities = await getTopVotedObjects(tripId, 'activity', activities);
+          if (topActivities.length > 0) {
+            const activitiesHeader = document.createElement('h4');
+            activitiesHeader.textContent = 'Активности:';
+            finalTripDetails.appendChild(activitiesHeader);
+            topActivities.forEach(activity => {
+              const activityElement = document.createElement('div');
+              activityElement.className = 'trip-element';
+              activityElement.innerHTML = `
+                <p><strong>Активность:</strong> ${activity.name}</p>
+                <p>${new Date(activity.date).toLocaleString()}</p>
+                <p>${activity.location}</p>
+              `;
+              finalTripDetails.appendChild(activityElement);
+            });
+          }
+        }
+
+        if (flights.length === 0 && hotels.length === 0 && activities.length === 0) {
+          finalTripDetails.innerHTML = '<p>Нет добавленных элементов.</p>';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Получение объекта с наибольшим количеством голосов "за"
+    async function getTopVotedObject(tripId, objectType, objects) {
+      const votesPromises = objects.map(async (obj) => {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}/votes/${objectType}/${obj[`${objectType}_id`]}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const votes = await response.json();
+        const forVotes = votes.filter(vote => vote.vote).length;
+        return { object: obj, forVotes };
+      });
+
+      const votesResults = await Promise.all(votesPromises);
+      const topVoted = votesResults.reduce((prev, current) => (prev.forVotes > current.forVotes) ? prev : current);
+      return topVoted.forVotes > 0 ? topVoted.object : null;
+    }
+
+    // Получение объектов с наибольшим количеством голосов "за"
+    async function getTopVotedObjects(tripId, objectType, objects) {
+      const votesPromises = objects.map(async (obj) => {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}/votes/${objectType}/${obj[`${objectType}_id`]}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const votes = await response.json();
+        const forVotes = votes.filter(vote => vote.vote).length;
+        return { object: obj, forVotes };
+      });
+
+      const votesResults = await Promise.all(votesPromises);
+      const topVotedObjects = votesResults.filter(result => result.forVotes > 0);
+      return topVotedObjects.map(result => result.object);
+    }
+
+    // Проверка даты для добавления активности, отеля или рейса
+    function checkDateWithinTrip(tripStartDate, tripEndDate, objectDate) {
+      const startDate = new Date(tripStartDate);
+      const endDate = new Date(tripEndDate);
+      const date = new Date(objectDate);
+      return date >= startDate && date <= endDate;
+    }
+
+    // Добавление рейса
+    document.getElementById('addFlightForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tripId = document.getElementById('flightTripId').value;
+      const flightNumber = document.getElementById('flightNumber').value;
+      const flightDeparture = document.getElementById('flightDeparture').value;
+      const flightArrival = document.getElementById('flightArrival').value;
+      const departureAirport = document.getElementById('departureAirport').value;
+      const arrivalAirport = document.getElementById('arrivalAirport').value;
+
+      try {
+        const tripResponse = await fetch(`http://localhost:3000/api/trips/${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const trip = await tripResponse.json();
+
+        if (!checkDateWithinTrip(trip.start_date, trip.end_date, flightDeparture) ||
+            !checkDateWithinTrip(trip.start_date, trip.end_date, flightArrival)) {
+          alert('Дата рейса должна быть в пределах дат поездки!');
+          return;
+        }
+
+        const response = await fetch('http://localhost:3000/api/flights', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            tripId: tripId,
+            flightNumber: flightNumber,
+            departure: flightDeparture,
+            arrival: flightArrival,
+            departureAirport: departureAirport,
+            arrivalAirport: arrivalAirport
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        alert('Рейс добавлен!');
+        document.getElementById('addFlightModal').style.display = 'none';
+        loadTripDetails(tripId);
+        loadFinalTrip(tripId);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    // Добавление отеля
+    document.getElementById('addHotelForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tripId = document.getElementById('hotelTripId').value;
+      const hotelName = document.getElementById('hotelName').value;
+      const hotelCheckIn = document.getElementById('hotelCheckIn').value;
+      const hotelCheckOut = document.getElementById('hotelCheckOut').value;
+      const hotelAddress = document.getElementById('hotelAddress').value;
+
+      try {
+        const tripResponse = await fetch(`http://localhost:3000/api/trips/${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const trip = await tripResponse.json();
+
+        if (!checkDateWithinTrip(trip.start_date, trip.end_date, hotelCheckIn) ||
+            !checkDateWithinTrip(trip.start_date, trip.end_date, hotelCheckOut)) {
+          alert('Дата заезда и выезда должна быть в пределах дат поездки!');
+          return;
+        }
+
+        const response = await fetch('http://localhost:3000/api/hotels', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            tripId: tripId,
+            name: hotelName,
+            checkIn: hotelCheckIn,
+            checkOut: hotelCheckOut,
+            address: hotelAddress
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        alert('Отель добавлен!');
+        document.getElementById('addHotelModal').style.display = 'none';
+        loadTripDetails(tripId);
+        loadFinalTrip(tripId);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    // Добавление активности
+    document.getElementById('addActivityForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tripId = document.getElementById('activityTripId').value;
+      const activityName = document.getElementById('activityName').value;
+      const activityDate = document.getElementById('activityDate').value;
+      const activityLocation = document.getElementById('activityLocation').value;
+
+      try {
+        const tripResponse = await fetch(`http://localhost:3000/api/trips/${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const trip = await tripResponse.json();
+
+        if (!checkDateWithinTrip(trip.start_date, trip.end_date, activityDate)) {
+          alert('Дата активности должна быть в пределах дат поездки!');
+          return;
+        }
+
+        const response = await fetch('http://localhost:3000/api/activities', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            tripId: tripId,
+            name: activityName,
+            date: activityDate,
+            location: activityLocation
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        alert('Активность добавлена!');
+        document.getElementById('addActivityModal').style.display = 'none';
+        loadTripDetails(tripId);
+        loadFinalTrip(tripId);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    // Загрузка участников поездки
+    async function loadTripMembers(tripId) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}/members`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const members = await response.json();
+        const membersContainer = document.getElementById(`membersContainer_${tripId}`);
+        membersContainer.innerHTML = '<h4>Участники:</h4>';
+        if (Array.isArray(members)) {
+          const userResponse = await fetch('http://localhost:3000/api/auth/me', {
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+          const currentUser = await userResponse.json();
+
+          members.forEach(member => {
+            const memberItem = document.createElement('div');
+            memberItem.className = 'member-item';
+            const statusClass = member.status === 'accepted' ? 'status-accepted' :
+                                member.status === 'declined' ? 'status-declined' : 'status-pending';
+            memberItem.innerHTML = `
+              <span>${member.name} ${member.surname} (${member.email})</span>
+              <div>
+                <span class="member-status ${statusClass}">${member.status === 'accepted' ? 'Принял' :
+                                                                  member.status === 'declined' ? 'Отклонил' : 'Ожидает'}</span>
+                ${member.user_id === currentUser.user_id && member.status === 'pending' ?
+                  `<button class="accept-button" onclick="updateMemberStatus(${tripId}, ${member.user_id}, 'accepted')">Принять</button>
+                   <button class="decline-button" onclick="updateMemberStatus(${tripId}, ${member.user_id}, 'declined')">Отклонить</button>` : ''}
+              </div>
+            `;
+            membersContainer.appendChild(memberItem);
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Обновление статуса участника поездки
+    async function updateMemberStatus(tripId, userId, status) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}/members/${userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ status }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        alert('Статус обновлён!');
+        loadTripMembers(tripId);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Загрузка деталей поездки (рейсы, отели, активности)
+    async function loadTripDetails(tripId) {
+      try {
+        const [flightsResponse, hotelsResponse, activitiesResponse] = await Promise.all([
+          fetch(`http://localhost:3000/api/flights?tripId=${tripId}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          }),
+          fetch(`http://localhost:3000/api/hotels?tripId=${tripId}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          }),
+          fetch(`http://localhost:3000/api/activities?tripId=${tripId}`, {
+            headers: { 'Authorization': `Bearer ${token}` },
+          })
+        ]);
+
+        const flights = await flightsResponse.json();
+        const hotels = await hotelsResponse.json();
+        const activities = await activitiesResponse.json();
+
+        const tripDetailsContainer = document.getElementById(`tripDetails_${tripId}`);
+        tripDetailsContainer.innerHTML = '<h4>Детали поездки:</h4>';
+
+        if (flights.length > 0) {
+          flights.forEach(flight => {
+            const flightElement = document.createElement('div');
+            flightElement.className = 'trip-element';
+            flightElement.innerHTML = `
+              <p><strong>Рейс:</strong> ${flight.flight_number}</p>
+              <p>${new Date(flight.departure).toLocaleString()} — ${new Date(flight.arrival).toLocaleString()}</p>
+              <p>${flight.departure_airport} → ${flight.arrival_airport}</p>
+              <div class="vote-buttons">
+                <button class="vote-button vote-for" onclick="vote(${tripId}, 'flight', ${flight.flight_id}, true)">За</button>
+                <button class="vote-button vote-against" onclick="vote(${tripId}, 'flight', ${flight.flight_id}, false)">Против</button>
+              </div>
+              <div class="votes-info" id="votes_flight_${flight.flight_id}"></div>
+            `;
+            tripDetailsContainer.appendChild(flightElement);
+            loadVotes(tripId, 'flight', flight.flight_id);
+          });
+        }
+
+        if (hotels.length > 0) {
+          hotels.forEach(hotel => {
+            const hotelElement = document.createElement('div');
+            hotelElement.className = 'trip-element';
+            hotelElement.innerHTML = `
+              <p><strong>Отель:</strong> ${hotel.name}</p>
+              <p>${new Date(hotel.check_in).toLocaleString()} — ${new Date(hotel.check_out).toLocaleString()}</p>
+              <p>${hotel.address}</p>
+              <div class="vote-buttons">
+                <button class="vote-button vote-for" onclick="vote(${tripId}, 'hotel', ${hotel.hotel_id}, true)">За</button>
+                <button class="vote-button vote-against" onclick="vote(${tripId}, 'hotel', ${hotel.hotel_id}, false)">Против</button>
+              </div>
+              <div class="votes-info" id="votes_hotel_${hotel.hotel_id}"></div>
+            `;
+            tripDetailsContainer.appendChild(hotelElement);
+            loadVotes(tripId, 'hotel', hotel.hotel_id);
+          });
+        }
+
+        if (activities.length > 0) {
+          activities.forEach(activity => {
+            const activityElement = document.createElement('div');
+            activityElement.className = 'trip-element';
+            activityElement.innerHTML = `
+              <p><strong>Активность:</strong> ${activity.name}</p>
+              <p>${new Date(activity.date).toLocaleString()}</p>
+              <p>${activity.location}</p>
+              <div class="vote-buttons">
+                <button class="vote-button vote-for" onclick="vote(${tripId}, 'activity', ${activity.activity_id}, true)">За</button>
+                <button class="vote-button vote-against" onclick="vote(${tripId}, 'activity', ${activity.activity_id}, false)">Против</button>
+              </div>
+              <div class="votes-info" id="votes_activity_${activity.activity_id}"></div>
+            `;
+            tripDetailsContainer.appendChild(activityElement);
+            loadVotes(tripId, 'activity', activity.activity_id);
+          });
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Загрузка голосов за элемент поездки
+    async function loadVotes(tripId, objectType, objectId) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}/votes/${objectType}/${objectId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const votes = await response.json();
+        const votesContainer = document.getElementById(`votes_${objectType}_${objectId}`);
+        if (votes.length > 0) {
+          let votesInfo = '<strong>Голоса:</strong> ';
+          votesInfo += votes.map(vote => `${vote.name} ${vote.surname}: ${vote.vote ? 'За' : 'Против'}`).join(', ');
+          votesContainer.textContent = votesInfo;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Голосование за элемент поездки
+    async function vote(tripId, objectType, objectId, voteValue) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}/vote`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            objectType,
+            objectId,
+            vote: voteValue
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        loadVotes(tripId, objectType, objectId);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
     // Выход из аккаунта
     document.getElementById('logoutButton').addEventListener('click', () => {
       localStorage.removeItem('token');
-      window.location.href = '/login.html';
+      window.location.href = '/index.html';
     });
 
-    // Обработчики для открытия модальных окон
-    document.getElementById('addTripLink').addEventListener('click', () => {
-      document.getElementById('addTripModal').style.display = 'flex';
-    });
-
-    document.getElementById('addFlightLink').addEventListener('click', () => {
-      document.getElementById('addFlightModal').style.display = 'flex';
-    });
-
+    // Обработчик для открытия модального окна добавления поездки
     document.getElementById('addTripButton').addEventListener('click', () => {
       document.getElementById('addTripModal').style.display = 'flex';
     });
@@ -270,42 +878,54 @@
       document.getElementById('addFlightModal').style.display = 'none';
     });
 
+    document.getElementById('cancelAddHotel').addEventListener('click', () => {
+      document.getElementById('addHotelModal').style.display = 'none';
+    });
+
+    document.getElementById('cancelAddActivity').addEventListener('click', () => {
+      document.getElementById('addActivityModal').style.display = 'none';
+    });
+
+    document.getElementById('cancelInviteMember').addEventListener('click', () => {
+      document.getElementById('inviteMemberModal').style.display = 'none';
+    });
+
     // Добавление поездки
     document.getElementById('addTripForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const tripName = document.getElementById('tripName').value;
-    const tripStartDate = document.getElementById('tripStartDate').value;
-    const tripEndDate = document.getElementById('tripEndDate').value;
+      e.preventDefault();
+      const tripName = document.getElementById('tripName').value;
+      const tripStartDate = document.getElementById('tripStartDate').value;
+      const tripEndDate = document.getElementById('tripEndDate').value;
 
-    try {
+      try {
         const response = await fetch('http://localhost:3000/api/trips', {
-        method: 'POST',
-        headers: {
+          method: 'POST',
+          headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
+          },
+          body: JSON.stringify({
             name: tripName,
             startDate: tripStartDate,
             endDate: tripEndDate
-        }),
+          }),
         });
         if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         alert('Поездка добавлена!');
         document.getElementById('addTripModal').style.display = 'none';
         loadTrips();
-    } catch (error) {
+      } catch (error) {
         console.error('Error:', error);
-    }
+      }
     });
-
 
     // Добавление рейса
     document.getElementById('addFlightForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const tripId = document.getElementById('flightTripId').value;
       const flightNumber = document.getElementById('flightNumber').value;
       const flightDeparture = document.getElementById('flightDeparture').value;
       const flightArrival = document.getElementById('flightArrival').value;
@@ -320,7 +940,7 @@
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            tripId: 1, // Здесь нужно передавать ID текущей поездки
+            tripId: tripId,
             flightNumber: flightNumber,
             departure: flightDeparture,
             arrival: flightArrival,
@@ -339,34 +959,145 @@
       }
     });
 
+    // Добавление отеля
+    document.getElementById('addHotelForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tripId = document.getElementById('hotelTripId').value;
+      const hotelName = document.getElementById('hotelName').value;
+      const hotelCheckIn = document.getElementById('hotelCheckIn').value;
+      const hotelCheckOut = document.getElementById('hotelCheckOut').value;
+      const hotelAddress = document.getElementById('hotelAddress').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/api/hotels', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            tripId: tripId,
+            name: hotelName,
+            checkIn: hotelCheckIn,
+            checkOut: hotelCheckOut,
+            address: hotelAddress
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        alert('Отель добавлен!');
+        document.getElementById('addHotelModal').style.display = 'none';
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    // Добавление активности
+    document.getElementById('addActivityForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tripId = document.getElementById('activityTripId').value;
+      const activityName = document.getElementById('activityName').value;
+      const activityDate = document.getElementById('activityDate').value;
+      const activityLocation = document.getElementById('activityLocation').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/api/activities', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            tripId: tripId,
+            name: activityName,
+            date: activityDate,
+            location: activityLocation
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        alert('Активность добавлена!');
+        document.getElementById('addActivityModal').style.display = 'none';
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+
+    // Приглашение участника
+    document.getElementById('inviteMemberForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const tripId = document.getElementById('inviteTripId').value;
+      const memberEmail = document.getElementById('memberEmail').value;
+
+      try {
+        // Поиск пользователя по email
+        const userResponse = await fetch(`http://localhost:3000/api/auth/users?email=${memberEmail}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!userResponse.ok) {
+          throw new Error(`HTTP error! status: ${userResponse.status}`);
+        }
+        const user = await userResponse.json();
+        if (!user) {
+          alert('Пользователь с таким email не найден.');
+          return;
+        }
+
+        // Добавление участника в поездку
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}/members`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            userId: user.user_id
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        alert('Участник приглашён!');
+        document.getElementById('inviteMemberModal').style.display = 'none';
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Ошибка при приглашении участника.');
+      }
+    });
+
     // Загрузка данных при открытии страницы
     loadUserInfo();
     loadTrips();
 
     // Переход на страницу поездки
     function viewTrip(tripId) {
-      window.location.href = `/trip.html?tripId=${tripId}`;
+      window.location.href = `/trips.html?tripId=${tripId}`;
     }
 
-    // Отмена поездки
-    async function cancelTrip(tripId) {
-      try {
-        const response = await fetch(`http://localhost:3000/api/trips/${tripId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ status: 'cancelled' }),
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        alert('Поездка отменена!');
-        loadTrips();
-      } catch (error) {
-        console.error('Error:', error);
-      }
+    // Открытие модальных окон для добавления рейса, отеля и активности
+    function openAddFlightModal(tripId) {
+      document.getElementById('flightTripId').value = tripId;
+      document.getElementById('addFlightModal').style.display = 'flex';
+    }
+
+    function openAddHotelModal(tripId) {
+      document.getElementById('hotelTripId').value = tripId;
+      document.getElementById('addHotelModal').style.display = 'flex';
+    }
+
+    function openAddActivityModal(tripId) {
+      document.getElementById('activityTripId').value = tripId;
+      document.getElementById('addActivityModal').style.display = 'flex';
+    }
+
+    // Открытие модального окна для приглашения участника
+    function openInviteMemberModal(tripId) {
+      document.getElementById('inviteTripId').value = tripId;
+      document.getElementById('inviteMemberModal').style.display = 'flex';
     }
   </script>
 </body>

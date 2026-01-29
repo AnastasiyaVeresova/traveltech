@@ -22,7 +22,7 @@
       width: 300px;
       text-align: center;
     }
-    input {
+    input, select {
       width: 93%;
       padding: 10px;
       margin: 10px 0;
@@ -53,7 +53,23 @@
       <input type="date" id="birthDate" placeholder="Дата рождения" required>
       <input type="email" id="email" placeholder="Email" required>
       <input type="password" id="password" placeholder="Пароль" required>
-      <input type="text" id="timezone" placeholder="Часовой пояс (например, Europe/Moscow)" required>
+
+      <!-- Выпадающий список для выбора часового пояса -->
+      <select id="timezone" required>
+        <option value="" disabled selected>Выберите часовой пояс</option>
+        <option value="Europe/Moscow">Europe/Moscow (MSK, UTC+3)</option>
+        <option value="Europe/Kaliningrad">Europe/Kaliningrad (EET, UTC+2)</option>
+        <option value="Europe/Samara">Europe/Samara (SAMT, UTC+4)</option>
+        <option value="Asia/Yekaterinburg">Asia/Yekaterinburg (YEKT, UTC+5)</option>
+        <option value="Asia/Omsk">Asia/Omsk (OMST, UTC+6)</option>
+        <option value="Asia/Krasnoyarsk">Asia/Krasnoyarsk (KRAT, UTC+7)</option>
+        <option value="Asia/Irkutsk">Asia/Irkutsk (IRKT, UTC+8)</option>
+        <option value="Asia/Yakutsk">Asia/Yakutsk (YAKT, UTC+9)</option>
+        <option value="Asia/Vladivostok">Asia/Vladivostok (VLAT, UTC+10)</option>
+        <option value="Asia/Magadan">Asia/Magadan (MAGT, UTC+11)</option>
+        <option value="Asia/Kamchatka">Asia/Kamchatka (PETT, UTC+12)</option>
+      </select>
+
       <button type="submit">Зарегистрироваться</button>
     </form>
     <p>Уже есть аккаунт? <a href="/login.html">Войти</a></p>

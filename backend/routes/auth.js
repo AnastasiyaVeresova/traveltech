@@ -55,4 +55,18 @@ router.get('/me', authenticateToken, async (req, res) => {
   }
 });
 
+// Поиск пользователя по email
+router.get('/users', authenticateToken, async (req, res) => {
+  const { email } = req.query;
+  try {
+    const [users] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+    res.json(users[0]);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;

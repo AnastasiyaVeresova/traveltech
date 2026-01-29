@@ -1,14 +1,16 @@
 import express from 'express';
 import pool from '../config/db.js';
+import authenticateToken from '../middleware/auth.js'; 
 
 const router = express.Router();
 
 // Получение всех отелей для поездки
-router.get('/:tripId', async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
+  const { tripId } = req.query;
   try {
     const [hotels] = await pool.query(
       'SELECT * FROM hotels WHERE trip_id = ?',
-      [req.params.tripId]
+      [tripId]
     );
     res.json(hotels);
   } catch (error) {
@@ -17,7 +19,7 @@ router.get('/:tripId', async (req, res) => {
 });
 
 // Добавление нового отеля
-router.post('/', async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   const { tripId, name, checkIn, checkOut, address } = req.body;
   try {
     const [result] = await pool.query(

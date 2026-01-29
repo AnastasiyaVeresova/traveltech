@@ -109,6 +109,29 @@ CREATE TABLE IF NOT EXISTS conflicts (
 );
 
 
+CREATE TABLE IF NOT EXISTS trip_members (
+    trip_id INT NOT NULL,
+    user_id INT NOT NULL,
+    role ENUM('organizer', 'member') NOT NULL,
+    PRIMARY KEY (trip_id, user_id),
+    FOREIGN KEY (trip_id) REFERENCES trips(trip_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+ALTER TABLE trip_members ADD COLUMN status ENUM('pending', 'accepted', 'declined') DEFAULT 'pending';
+
+
+-- Таблица для голосования за элементы поездки
+CREATE TABLE IF NOT EXISTS votes (
+    vote_id INT AUTO_INCREMENT PRIMARY KEY,
+    object_type ENUM('flight', 'hotel', 'activity') NOT NULL,
+    object_id INT NOT NULL,
+    user_id INT NOT NULL,
+    vote BOOLEAN NOT NULL, -- true: за, false: против
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_vote (object_type, object_id, user_id)
+);
+
 -- Добавим 3 пользователей: организатора и двух участников поездки
 
 -- Пользователь 1: Организатор
@@ -213,3 +236,14 @@ SELECT * FROM activities;
 
 -- Посмотреть историю изменений
 SELECT * FROM changes;
+
+ALTER TABLE users ADD COLUMN password VARCHAR(255);
+
+-- SET SQL_SAFE_UPDATES = 0;
+-- DELETE FROM users WHERE name = "F";
+-- SELECT * FROM users WHERE name = "F";
+
+ALTER TABLE users
+ADD COLUMN surname VARCHAR(255) AFTER name,
+ADD COLUMN patronymic VARCHAR(255) AFTER surname,
+ADD COLUMN birth_date DATE AFTER patronymic;

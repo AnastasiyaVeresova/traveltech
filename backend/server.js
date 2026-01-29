@@ -15,7 +15,13 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Разрешаем доступ к папке frontend
-app.use(express.static(path.join(path.resolve(), '../frontend')));
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, '../frontend')));
+
+// Маршрут для главной страницы
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
 
 // Маршруты
 app.use('/api/auth', authRoutes);

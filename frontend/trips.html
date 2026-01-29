@@ -3,18 +3,324 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TravelTech — Поездки</title>
-  <link rel="stylesheet" href="styles/trips.css">
+  <title>TravelTech — Детали поездки</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 0;
+    }
+    .header {
+      background-color: #007bff;
+      color: #fff;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      margin: 0;
+    }
+    .logout-button {
+      background-color: #dc3545;
+      color: #fff;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .trip-container {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .trip-info {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .trip-section {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .trip-section h3 {
+      margin-top: 0;
+    }
+    .trip-element {
+      background: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    .vote-buttons {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+    }
+    .vote-button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .vote-for {
+      background-color: #28a745;
+      color: #fff;
+    }
+    .vote-against {
+      background-color: #dc3545;
+      color: #fff;
+    }
+    .votes-info {
+      margin-top: 5px;
+      font-size: 0.9em;
+      color: #666;
+    }
+    .back-button {
+      background-color: #6c757d;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      width: fit-content;
+    }
+  </style>
 </head>
 <body>
   <div class="header">
     <h1>TravelTech</h1>
-    <button id="logoutButton">Выйти</button>
+    <button class="logout-button" id="logoutButton">Выйти</button>
   </div>
-  <div class="trips-container">
-    <h2>Ваши поездки</h2>
-    <div id="tripsList"></div>
+  <div class="trip-container">
+    <button class="back-button" id="backButton">Назад</button>
+    <div class="trip-info" id="tripInfo"></div>
+    <div class="trip-section">
+      <h3>Рейсы</h3>
+      <div id="flightsContainer"></div>
+    </div>
+    <div class="trip-section">
+      <h3>Отели</h3>
+      <div id="hotelsContainer"></div>
+    </div>
+    <div class="trip-section">
+      <h3>Активности</h3>
+      <div id="activitiesContainer"></div>
+    </div>
   </div>
-  <script src="scripts/trips.js"></script>
+
+  <script>
+    // Проверка авторизации
+    const token = localStorage.getItem('token');
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    // Получение tripId из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const tripId = urlParams.get('tripId');
+
+    // Загрузка информации о поездке
+    async function loadTripInfo() {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const trip = await response.json();
+        const tripInfoContainer = document.getElementById('tripInfo');
+        tripInfoContainer.innerHTML = `
+          <h2>${trip.name}</h2>
+          <p>${new Date(trip.start_date).toLocaleDateString()} — ${new Date(trip.end_date).toLocaleDateString()}</p>
+          <p>Статус: ${trip.status}</p>
+        `;
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Загрузка рейсов
+    async function loadFlights() {
+      try {
+        const response = await fetch(`http://localhost:3000/api/flights?tripId=${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const flights = await response.json();
+        const flightsContainer = document.getElementById('flightsContainer');
+        flightsContainer.innerHTML = '';
+
+        if (flights.length > 0) {
+          flights.forEach(flight => {
+            const flightElement = document.createElement('div');
+            flightElement.className = 'trip-element';
+            flightElement.innerHTML = `
+              <p><strong>Рейс:</strong> ${flight.flight_number}</p>
+              <p>${new Date(flight.departure).toLocaleString()} — ${new Date(flight.arrival).toLocaleString()}</p>
+              <p>${flight.departure_airport} → ${flight.arrival_airport}</p>
+
+              <div class="votes-info" id="votes_flight_${flight.flight_id}"></div>
+            `;
+            flightsContainer.appendChild(flightElement);
+            loadVotes(tripId, 'flight', flight.flight_id);
+          });
+        } else {
+          flightsContainer.innerHTML = '<p>Нет добавленных рейсов.</p>';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Загрузка отелей
+    async function loadHotels() {
+      try {
+        const response = await fetch(`http://localhost:3000/api/hotels?tripId=${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const hotels = await response.json();
+        const hotelsContainer = document.getElementById('hotelsContainer');
+        hotelsContainer.innerHTML = '';
+
+        if (hotels.length > 0) {
+          hotels.forEach(hotel => {
+            const hotelElement = document.createElement('div');
+            hotelElement.className = 'trip-element';
+            hotelElement.innerHTML = `
+              <p><strong>Отель:</strong> ${hotel.name}</p>
+              <p>${new Date(hotel.check_in).toLocaleString()} — ${new Date(hotel.check_out).toLocaleString()}</p>
+              <p>${hotel.address}</p>
+
+              <div class="votes-info" id="votes_hotel_${hotel.hotel_id}"></div>
+            `;
+            hotelsContainer.appendChild(hotelElement);
+            loadVotes(tripId, 'hotel', hotel.hotel_id);
+          });
+        } else {
+          hotelsContainer.innerHTML = '<p>Нет добавленных отелей.</p>';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Загрузка активностей
+    async function loadActivities() {
+      try {
+        const response = await fetch(`http://localhost:3000/api/activities?tripId=${tripId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const activities = await response.json();
+        const activitiesContainer = document.getElementById('activitiesContainer');
+        activitiesContainer.innerHTML = '';
+
+        if (activities.length > 0) {
+          activities.forEach(activity => {
+            const activityElement = document.createElement('div');
+            activityElement.className = 'trip-element';
+            activityElement.innerHTML = `
+              <p><strong>Активность:</strong> ${activity.name}</p>
+              <p>${new Date(activity.date).toLocaleString()}</p>
+              <p>${activity.location}</p>
+
+              <div class="votes-info" id="votes_activity_${activity.activity_id}"></div>
+            `;
+            activitiesContainer.appendChild(activityElement);
+            loadVotes(tripId, 'activity', activity.activity_id);
+          });
+        } else {
+          activitiesContainer.innerHTML = '<p>Нет добавленных активностей.</p>';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+              //     <div class="vote-buttons">
+              //   <button class="vote-button vote-for" onclick="vote(${tripId}, 'activity', ${activity.activity_id}, true)">За</button>
+              //   <button class="vote-button vote-against" onclick="vote(${tripId}, 'activity', ${activity.activity_id}, false)">Против</button>
+              // </div>
+
+    // Загрузка голосов за элемент поездки
+    async function loadVotes(tripId, objectType, objectId) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}/votes/${objectType}/${objectId}`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const votes = await response.json();
+        const votesContainer = document.getElementById(`votes_${objectType}_${objectId}`);
+        if (votes.length > 0) {
+          let votesInfo = '<strong>Голоса:</strong> ';
+          votesInfo += votes.map(vote => `${vote.name} ${vote.surname}: ${vote.vote ? 'За' : 'Против'}`).join(', ');
+          votesContainer.textContent = votesInfo;
+        } else {
+          votesContainer.textContent = 'Голосов пока нет.';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Голосование за элемент поездки
+    async function vote(tripId, objectType, objectId, voteValue) {
+      try {
+        const response = await fetch(`http://localhost:3000/api/trips/${tripId}/vote`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            objectType,
+            objectId,
+            vote: voteValue
+          }),
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        loadVotes(tripId, objectType, objectId);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+
+    // Возврат на главную страницу
+    document.getElementById('backButton').addEventListener('click', () => {
+      window.location.href = '/dashboard.html';
+    });
+
+    // Выход из аккаунта
+    document.getElementById('logoutButton').addEventListener('click', () => {
+      localStorage.removeItem('token');
+      window.location.href = '/login.html';
+    });
+
+    // Загрузка данных при открытии страницы
+    loadTripInfo();
+    loadFlights();
+    loadHotels();
+    loadActivities();
+  </script>
 </body>
 </html>
