@@ -16,10 +16,26 @@ USE traveltech;
 CREATE TABLE IF NOT EXISTS users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    surname VARCHAR(255) NOT NULL,
+    patronymic VARCHAR(255) NOT NULL,
+    birth_date DATE,
     email VARCHAR(255) UNIQUE NOT NULL,
     timezone VARCHAR(50) NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    password VARCHAR(255) UNIQUE NOT NULL
 );
+
+DELIMITER //
+CREATE TRIGGER check_birth_date_before_insert
+BEFORE INSERT ON users
+FOR EACH ROW
+BEGIN
+    IF NEW.birth_date > CURDATE() THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Дата рождения не может быть в будущем';
+    END IF;
+END//
+DELIMITER ;
 
 -- 4. Создание таблицы trips (если её нет)
 CREATE TABLE IF NOT EXISTS trips (
@@ -135,16 +151,32 @@ CREATE TABLE IF NOT EXISTS votes (
 -- Добавим 3 пользователей: организатора и двух участников поездки
 
 -- Пользователь 1: Организатор
-INSERT INTO users (name, email, timezone)
-VALUES ('Владимир Петров', 'vladimir@example.com', 'Europe/Moscow');
+INSERT INTO users (name, surname, patronymic, birth_date, email, timezone, created_at, password)
+VALUES ('Владимир', 'Вековой','Владимирович', '1999-09-23','vladimir@example.com', 'Europe/Moscow', '2026-01-30', '666');
 
--- Пользователь 2: Участник
-INSERT INTO users (name, email, timezone)
-VALUES ('Анна Сидорова', 'anna@example.com', 'Europe/Moscow');
+INSERT INTO users (name, surname, patronymic, birth_date, email, timezone, created_at, password)
+VALUES (
+    'Мария',
+    'Петрова',
+    'Александровна',
+    '1997-03-12',
+    'maria@example.com',
+    'Europe/Moscow',
+    '2026-01-30 00:00:00',
+    'maria123'
+);
 
--- Пользователь 3: Участник
-INSERT INTO users (name, email, timezone)
-VALUES ('Игорь Иванов', 'igor@example.com', 'Asia/Yekaterinburg');
+INSERT INTO users (name, surname, patronymic, birth_date, email, timezone, created_at, password)
+VALUES (
+    'Алексей',
+    'Сидоров',
+    'Игоревич',
+    '1992-11-05',
+    'alexey@example.com',
+    'Asia/Yekaterinburg',
+    '2026-01-30 00:00:00',
+    'alexey456'
+);
 
 
 -- Создадим одну поездку — "Лето в Сочи 2026"
@@ -201,17 +233,17 @@ VALUES (1, 'Поход на Красную Поляну', '2026-07-08 09:00:00',
 INSERT INTO activities (trip_id, name, date, location, status)
 VALUES (1, 'Ужин в ресторане "Белый лебедь"', '2026-07-10 19:00:00', 'г. Сочи, ул. Театральная, 2', 'proposed');
 
--- Симулируем, что Владимир добавил рейс, Анна — отель, а Игорь — активность
+-- Симулируем, что Владимир добавил рейс, Мария — отель, а Алексей — активность
 
 -- Владимир добавил рейс туда
 INSERT INTO changes (trip_id, object_id, object_type, change_type, data, user_id)
 VALUES (1, 1, 'flight', 'add', '{"flight_number": "SU1234", "departure": "2026-07-01 10:00:00", "arrival": "2026-07-01 12:30:00"}', 1);
 
--- Анна добавила отель Radisson
+-- Мария добавила отель Radisson
 INSERT INTO changes (trip_id, object_id, object_type, change_type, data, user_id)
 VALUES (1, 1, 'hotel', 'add', '{"name": "Radisson Collection Paradise Resort & Spa", "check_in": "2026-07-01 14:00:00"}', 2);
 
--- Игорь добавил активность "Экскурсия в аквапарк"
+-- Алексей добавил активность "Экскурсия в аквапарк"
 INSERT INTO changes (trip_id, object_id, object_type, change_type, data, user_id)
 VALUES (1, 1, 'activity', 'add', '{"name": "Экскурсия в аквапарк \\"Аквалоо\\"", "date": "2026-07-05 10:00:00"}', 3);
 
@@ -237,13 +269,9 @@ SELECT * FROM activities;
 -- Посмотреть историю изменений
 SELECT * FROM changes;
 
-ALTER TABLE users ADD COLUMN password VARCHAR(255);
 
 -- SET SQL_SAFE_UPDATES = 0;
 -- DELETE FROM users WHERE name = "F";
 -- SELECT * FROM users WHERE name = "F";
 
-ALTER TABLE users
-ADD COLUMN surname VARCHAR(255) AFTER name,
-ADD COLUMN patronymic VARCHAR(255) AFTER surname,
-ADD COLUMN birth_date DATE AFTER patronymic;
+
