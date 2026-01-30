@@ -270,6 +270,13 @@ SELECT * FROM activities;
 SELECT * FROM changes;
 
 
+DESCRIBE users;
+-- Пример хеширования пароля с помощью MD5
+UPDATE users SET password = MD5('666') WHERE email = 'vladimir@example.com';
+UPDATE users SET password = MD5('maria123') WHERE email = 'maria@example.com';
+UPDATE users SET password = MD5('alexey456') WHERE email = 'alexey@example.com';
+
+
 -- SET SQL_SAFE_UPDATES = 0;
 -- DELETE FROM users WHERE name = "F";
 -- SELECT * FROM users WHERE name = "F";
